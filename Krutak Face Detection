@@ -1,0 +1,70 @@
+with open ("properties.txt") as prop:
+    property=prop.readlines()
+from win32com.client import Dispatch
+def speak(str):
+    speak = Dispatch(("SAPI.Spvoice"))#helps to pronounce with the help of API of windows
+    speak.Speak(str)
+import cv2 as cv
+import numpy as np
+import numpy as npQ
+import face_recognition as fr
+import os
+path='IMAGES'
+img=[]
+classnames=[]
+mylist=os.listdir(path)
+print(mylist)
+for cl in mylist:
+    curImg=cv.imread(f'{path}/{cl}')
+    img.append(curImg)
+    classnames.append(os.path.splitext(cl)[0])
+
+print(classnames)
+def findEncodings(images):#images is the list of images
+    encodings = []
+    for img in images:
+     image=cv.cvtColor(img,cv.COLOR_BGR2RGB)
+     encode= fr.face_encodings(img)[0]
+     encodings.append(encode)
+    return encodings
+encodelist=findEncodings(img)
+print('Encoding Compete',len(encodelist))
+cap = cv.VideoCapture(0)
+while (True):
+    # Capture the video frame
+    # by frame
+    ret, img = cap.read()
+    imgS=cv.resize(img,(0,0),None,0.25,0.25)
+    imgS=cv.cvtColor(imgS,cv.COLOR_BGR2RGB)
+    face_curr_frame=fr.face_locations(imgS)
+    encodefaces_in_curr_frame=fr.face_encodings(imgS,face_curr_frame)
+    # Now we will run a for loop for both the above lists
+    for facelocs,encodings in zip(face_curr_frame,encodefaces_in_curr_frame):
+        matches=fr.compare_faces(encodelist,encodings)
+        facedis=fr.face_distance(encodelist,encodings)
+        print(facedis)
+        matchindex=np.argmin(facedis)
+        if matches[matchindex]:
+            name=classnames[matchindex]
+            print(name)
+            if __name__ == '__main__':
+                speak(property[matchindex])
+
+            cv.putText(img,
+                          name,
+                        (100, 100),
+                        cv.FONT_HERSHEY_SIMPLEX, 1,
+                        (0, 255, 255),
+                        4,cv.LINE_4)
+    # Display the resulting frame
+    cv.imshow('frame',img)
+
+    # the 'q' button is set as the
+    # quitting button you may use any
+    # desired button of your choice
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        break
+# After the loop release the cap object
+cap.release()
+# Destroy all the windows
+cv.destroyAllWindows()
