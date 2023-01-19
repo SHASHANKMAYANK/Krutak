@@ -4,6 +4,7 @@ from win32com.client import Dispatch
 def speak(str):
     speak = Dispatch(("SAPI.Spvoice"))#helps to pronounce with the help of API of windows
     speak.Speak(str)
+
 import cv2 as cv
 import numpy as np
 import numpy as npQ
@@ -28,7 +29,7 @@ def findEncodings(images):#images is the list of images
      encodings.append(encode)
     return encodings
 encodelist=findEncodings(img)
-print('Encoding Compete',len(encodelist))
+print('Encoding Complete',len(encodelist))
 cap = cv.VideoCapture(0)
 while (True):
     # Capture the video frame
@@ -46,16 +47,19 @@ while (True):
         matchindex=np.argmin(facedis)
         if matches[matchindex]:
             name=classnames[matchindex]
+            cv.putText(img, name,
+                       (100, 100),
+                       cv.FONT_HERSHEY_SIMPLEX, 1,
+                       (0, 255, 255),
+                       4, cv.LINE_4)
             print(name)
+            with open('attendance.txt', 'a') as file:
+                file.write(name.capitalize()+" is present")
+                file.write('\n')
+            cv.imshow('frame', img)
             if __name__ == '__main__':
                 speak(property[matchindex])
-
-            cv.putText(img,
-                          name,
-                        (100, 100),
-                        cv.FONT_HERSHEY_SIMPLEX, 1,
-                        (0, 255, 255),
-                        4,cv.LINE_4)
+            cv.imshow('frame', img)
     # Display the resulting frame
     cv.imshow('frame',img)
 
