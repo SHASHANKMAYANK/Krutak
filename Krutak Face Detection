@@ -1,13 +1,17 @@
+import pywhatkit as pwt
+import datetime
+def sending_whatsappmsg(number):
+    hour = datetime.datetime.now().hour
+    minute = datetime.datetime.now().minute + 1
+    pwt.sendwhatmsg(number, "Attendance marked", hour, minute, 7)
 with open ("properties.txt") as prop:
     property=prop.readlines()
 from win32com.client import Dispatch
 def speak(str):
     speak = Dispatch(("SAPI.Spvoice"))#helps to pronounce with the help of API of windows
     speak.Speak(str)
-
 import cv2 as cv
 import numpy as np
-import numpy as npQ
 import face_recognition as fr
 import os
 path='IMAGES'
@@ -33,8 +37,9 @@ print('Encoding Complete',len(encodelist))
 cap = cv.VideoCapture(0)
 while (True):
     # Capture the video frame
-    # by frame
+    # by frameq
     ret, img = cap.read()
+    cv.imshow('frame',img)
     imgS=cv.resize(img,(0,0),None,0.25,0.25)
     imgS=cv.cvtColor(imgS,cv.COLOR_BGR2RGB)
     face_curr_frame=fr.face_locations(imgS)
@@ -56,7 +61,20 @@ while (True):
             with open('attendance.txt', 'a') as file:
                 file.write(name.capitalize()+" is present")
                 file.write('\n')
+
             cv.imshow('frame', img)
+            if name=="shashank":
+                sending_whatsappmsg('+917567918624')
+            elif name=="shailesh":
+                sending_whatsappmsg('+917992258151')
+            elif name=='priyansh':
+                sending_whatsappmsg('+916376304803')
+            elif name=='dhruv':
+                hour = datetime.datetime.now().hour
+                minute = datetime.datetime.now().minute + 1
+                pwt.sendwhatmsg('+919137828829', "Attendance marked", hour, minute, 7)
+            elif name=='niladri':
+                sending_whatsappmsg('+919899366897')
             if __name__ == '__main__':
                 speak(property[matchindex])
             cv.imshow('frame', img)
